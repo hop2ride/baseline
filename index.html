@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<meta charset="utf-8">
+		<title>Hop2ride</title>
+		<meta name="generator" content="Bootply" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
+		<!--[if lt IE 9]>
+			<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<link href="css/styles.css" rel="stylesheet">
+
+		<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <!--link rel="stylesheet" href="./css/bootstrap.css" media="screen"-->
+    <link href="./css/main.css" rel="stylesheet" type="text/css">
+    <link href="./css/hopride.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="./Zebra_Datepicker/public/css/default.css" type="text/css">
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false&amp;key=AIzaSyANY-mT83kIpePNNiCQrTv2wSRwHKszpEc"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js"></script>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true&libraries=places&language=en-US"></script>
+    <script type="text/javascript" src="./Zebra_Datepicker/public/javascript/zebra_datepicker.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.1/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+    <script>
+        $(function () {
+            $("#datepicker").datepicker();
+        });
+    </script>
+    <script>
+
+        var autocombox1;
+        var autocombox2;
+        var postride_data = {};
+        var lroute;
+
+        function Showpostride() {
+
+            var divpostride = document.getElementById("postride");
+            var divpnlhome = document.getElementById("pnlhome");
+            lroute = document.getElementById("lblroute");
+            autocombox1 = document.getElementById("google_places_ac");
+            autocombox2 = document.getElementById("google_places_ac1");
+            var dtdatepicker = document.getElementById("datepicker");
+            var dtlbltraveldate = document.getElementById("lbltraveldate");
+            var hour = document.getElementById("ddldepartureDatetimehr");
+            var minutes = document.getElementById("ddldepartureDatetimeminute");
+            var vtype = $('input[name="vtype"]:checked').val();
+            var dtlbltravelmode = document.getElementById("lblmodeoftravel");
+            dtlbltravelmode.innerHTML = "Mode of travel : " + vtype.toUpperCase()
+            var strhour = hour.options[hour.selectedIndex].value;
+            var strminute = minutes.options[minutes.selectedIndex].value;
+            
+            lblroute.innerHTML = " Offer Route :  " + autocombox1.value + " → " + autocombox2.value
+            dtlbltraveldate.innerHTML = "Planned Date : " + dtdatepicker.value + " at " + strhour + "hrs" + ":" + strminute + "minutes";
+            var seats = document.getElementById("ddlseatsavailable");
+            var strseats = seats.options[seats.selectedIndex].value;
+            var dtlblseats = document.getElementById("lblseats");
+            dtlblseats.innerHTML = "Seats Available : " + strseats;
+            //divavailableroutes.innerHTML = divroutes.innerHTML
+            var dtvtype = document.getElementById("ddlvtype");
+            var strvtype = dtvtype.options[dtvtype.selectedIndex].value;
+            var dtlblvmodel = document.getElementById("lblvmodal");
+            dtlblvmodel.innerHTML = "Vehicle Type :" + strvtype;
+              
+            var dtfare = document.getElementById("ddlfare");
+            var strfare = dtfare.options[dtfare.selectedIndex].value;
+            var dtlblfare = document.getElementById("lblfare");
+            dtlblfare.innerHTML = "Fare  :" + strfare;
+
+            var dtddlpreffered = document.getElementById("ddlpreffered");
+            var strpreffered = dtddlpreffered.options[dtddlpreffered.selectedIndex].value;
+            var dtlblpreffered = document.getElementById("lblpreffered");
+            dtlblpreffered.innerHTML = "Preffered :" + strpreffered;
+
+             
+            divpostride.style.visibility = "visible";
+            divpnlhome.style.display = "none";
+
+
+            var postride_data = {};
+                    postride_data.postid = "011422";
+                    postride_data.startpoint =autocombox1.value;
+                    postride_data.endpoint = autocombox2.value;
+                    postride_data.userid = "Naanthaan";
+                    postride_data.via = Demo.diravailableroutes.options[dtddlpreffered.selectedIndex].value;
+                    postride_data.restrictions = "onnumilla";
+
+
+        }
+        function closealert() {
+
+            $('#divalert').hide('slow');
+        }
+
+        //}
+
+        // function put(data, callback) {
+        //     $.ajax({
+        //         url: '/mysql_update'
+        //         type: 'POST',
+        //         data: JSON.stringify(data),
+        //         contentType: 'text/json',
+        //         success: function() { if ( callback ) callback(true); },
+        //         error  : function() { if ( callback ) callback(false); }
+        //     });
+        // }
+        // function get(callback) {
+        //     $.ajax('localhost:9001/' + '/', {
+        //         type: 'GET',
+        //         dataType: 'json',
+        //         success: function(data) { if ( callback ) callback(data); },
+        //         error  : function()     { if ( callback ) callback(null); }
+        //     });
+        // }
+
+        function confirmride() {
+            alert("### - Starting to post the data to Mysql - 1 - ###");
+            
+            $(function(){               
+                $('#div1').click(function(e){
+                    e.preventDefault();
+                    console.log('select_link clicked');
+
+                    var postride_data = {};
+                    //postride_data.postid = "011422";
+                    postride_data.pickuppoint =autocombox1.value;
+                    postride_data.droppoint = autocombox2.value;
+                    postride_data.userid = "Naanthaan";
+                    postride_data.route =  Demo.dirRenderer.getRouteIndex(); //"Kurukku sandu pondu";
+
+                    // var summaryPanel = document.getElementById("tasting_rooms_panel");
+                    // summaryPanel.innerHTML = route.legs[via].distance.text
+                    //  = Demo.dirRenderer.route.legs[via].distance.text   
+                    // postride_data.vi=$('#distance').text(directionsResult.routes[0].legs[0].distance.text);
+
+                    //postride_data.via =  Demo.dirRenderer.getPanel().value;
+                    postride_data.restrictions = "onnumilla";
+                    
+                    $.ajax({
+                        type: 'POST',
+                        data: JSON.stringify(postride_data),
+                        contentType: 'application/json',
+                        url: 'http://localhost:9001/mysql_update',                      
+                        // success: function(data) {
+                        //     console.log('success');
+                        //     console.log(JSON.stringify(data));
+                        // }
+                        success : function(callback){
+                            //Where $(this) => context == FORM
+                            console.log(JSON.parse(callback));
+                            $(this).html("Success!");
+                        },
+                        error : function(){
+                            $(this).html("Error!");
+                        }
+                    });
+                });             
+            });
+
+             $('#divalert').show();
+        }
+        angular.module('Otd', ['OtdDirectives']);
+
+        /* Controllers */
+        function SearchForm($scope) {
+            $scope.location = '';
+
+            $scope.doSearch = function () {
+                if ($scope.location === '') {
+                    alert('Directive did not update the location property in parent controller.');
+                } else {
+                    alert('Yay. Location: ' + $scope.location);
+                }
+            };
+        }
+
+        /* Directives */
+        var ang = angular.module('OtdDirectives', []);
+        ang.directive('googlePlaces', function () {
+            return {
+                restrict: 'E',
+                replace: true,
+                // transclude:true,
+                scope: { location: '=' },
+                template: '<input id="google_places_ac" name="google_places_ac" type="text" class="input-block-level" placeholder="Your departure point (address, city, station...)" />',
+
+                link: function ($scope, elm, attrs) {
+                    var autocomplete = new google.maps.places.Autocomplete($("#google_places_ac")[0], {});
+                    google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                        var place = autocomplete.getPlace();
+                        $scope.location = place.geometry.location.lat() + ',' + place.geometry.location.lng();
+                        $scope.$apply();
+                    });
+                }
+
+            }
+        });
+        /* Directives */
+
+        ang.directive('googlePlacess', function () {
+            return {
+                restrict: 'E',
+                replace: true,
+                // transclude:true,
+                scope: { location: '=' },
+                template: '<input id="google_places_ac1" name="google_places_ac" type="text" class="input-block-level" placeholder="Your arrival point (address, city, station...)" />',
+
+                link: function ($scope, elm, attrs) {
+                    var autocomplete = new google.maps.places.Autocomplete($("#google_places_ac1")[0], {});
+                    google.maps.event.addListener(autocomplete, 'place_changed', function () {
+                        var place = autocomplete.getPlace();
+                        $scope.location = place.geometry.location.lat() + ',' + place.geometry.location.lng();
+                        $scope.$apply();
+                    });
+                }
+
+            }
+        });
+
+        
+    </script>
+    <style>
+        .adp, .adp table
+        {
+            font-family: Roboto,Arial,sans-serif;
+            font-weight: 300;
+            color: #2c2c2c;
+            display: none;
+        }
+        .adp-listheader
+        {
+            display: none;
+        }
+    </style>
+</head>
+	<body>
+                    
+	<nav class="navbar navbar-fixed-top alt" data-spy="affix" data-offset-top="1000">
+	  <div class="container">
+          <div class="navbar-header">
+           <div id="header_logo">
+               <a href="index.html">
+                    <img src="assets/logos.png" class="logoImage" width="186" height="75" href="index.html"/>
+                    
+           </div>
+              <a class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		  </a>
+		</div>
+             <div class="navbar-collapse collapse" id="navbar">
+                 
+                 <!--a href="#sec1" class="navbar-brand">Share a ride</a-->
+                 
+		  <ul class="nav navbar-nav">
+			<li><a href="#sec2">How it works</a></li>
+            <li><a href="#postridecanvas">Share a ride</a></li>
+			<li><a href="#sec3">Safety</a></li>
+			<li><a href="#sec4">Stories</a></li>
+            <li><a href="#sec5">About Us</a></li>
+		  </ul>
+		</div>
+	   </div>
+              </div>
+	</nav>
+
+	<div class="header alt vert">
+	  <div class="container">
+		
+		 
+	  </div>
+	</div>
+
+	<hr>
+
+	<!--div id="sec1" class="blurb">
+	  <div class="container">
+		<div class="row">
+		  <div class="col-md-7">
+			<h1>Share a ride</h1>
+			<p class="lead">Share a ride</p>
+		  </div>
+		  <div class="col-md-5">
+			<h1 class="pull-right"><i class="icon-mobile-phone icon-3x"></i> <i class="icon-tablet icon-3x"></i> <i class="icon-laptop icon-3x"></i></h1>
+		  </div>
+		</div>
+	  </div>
+	</div-->
+
+		
+
+	<!-- post ride code -->
+    <style>
+        #map-container, #side-container, #side-container li
+        {
+            float: left;
+        }
+        
+        #map-container
+        {
+            width: 500px;
+            height: 600px;
+        }
+    </style>
+
+    <div id="postridecanvas" class="navbar navbar-inverse">
+        <!--div class="navbar-header">
+            <a class="navbar-brand" href="#">
+                <img src="images/hopridelogo.png" /></a>
+        </div-->
+        <div class="navbar-collapse collapse navbar-inverse-collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Login</a></li>
+                <li class="dropdown"><a href="#">Register </li>
+            </ul>
+        </div>
+    </div>
+    <ul class="breadcrumb">
+        <li><a href="#">Home</a></li>
+        <li class="active">Offer Ride</li>
+    </ul>
+    <br />
+    <div id="pnlhome">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Search/Offer a ride on your next long journey</h3>
+            </div>
+            <div class="panel-body">
+                <!--div style="position: absolute; left: 270px; top: 220px;">
+                    <img src="images/progressindicator.png" />
+                </div-->
+                <div class="content-wrapper">
+                    <div style="float: left; width: 50%; height: 100%; margin-bottom: 50px">
+                        <section class="main-block-content">
+                <div ng-app="Otd" ng-controller="SearchForm">
+                    <label for="inputPassword" class="col-lg-label">Pickup Location </label>
+                    <div style="width: 70%; margin-bottom: 2%">
+                        <google-places location="location"></google-places>
+                    </div>
+                    <label for="inputPassword" class="col-lg-label ">Drop-off location </label>
+                    <div style="width: 70%; margin-bottom: 2%">
+                        <google-placess location="location"></google-placess>
+                    </div>
+                    <div style="width: 70%; margin-bottom: 2%"><a href="#" class="btn btn-primary btn-xs" onclick="Demo.getDirections();">Show Routes</a></div>
+                </div>
+                <div class="well well-lg" id="dir-container" style="width: 70%; margin-bottom: 2%">
+                   
+                </div>
+                
+            </section>
+                    </div>
+                    <div class="panelmiddel">
+                    </div>
+                    <div style="float: right; width: 50%; height: 100%">
+                        <table style="width: 100%; padding-right: 5px" cellpadding="2px">
+                            <tr>
+                                <td style="width: 20%; padding-right: 20px">
+                                    <label for="inputPassword" class="col-lg-label">
+                                        Date
+                                    </label>
+                                    <input type="text" class="form-control" id="datepicker">
+                                </td>
+                                <td style="width: 7%; padding-right: 1px">
+                                    <label for="inputPassword" class="col-lg-label">
+                                        Time
+                                    </label>
+                                    <select id="ddldepartureDatetimehr" name="new_publication_step1[departureDate][time][hour]"
+                                        required="required" class="time-select">
+                                        <option value="" selected="selected"></option>
+                                        <option value="0">00</option>
+                                        <option value="1">01</option>
+                                        <option value="2">02</option>
+                                        <option value="3">03</option>
+                                        <option value="4">04</option>
+                                        <option value="5">05</option>
+                                        <option value="6">06</option>
+                                        <option value="7">07</option>
+                                        <option value="8">08</option>
+                                        <option value="9">09</option>
+                                        <option value="10">10</option>
+                                        <option value="11">11</option>
+                                        <option value="12">12</option>
+                                        <option value="13">13</option>
+                                        <option value="14">14</option>
+                                        <option value="15">15</option>
+                                        <option value="16">16</option>
+                                        <option value="17">17</option>
+                                        <option value="18">18</option>
+                                        <option value="19">19</option>
+                                        <option value="20">20</option>
+                                        <option value="21">21</option>
+                                        <option value="22">22</option>
+                                        <option value="23">23</option>
+                                    </select>
+                                    :
+                                </td>
+                                <td style="width: 15%; padding-right: 1px; text-align: left; padding-top: 18px;">
+                                    <label for="inputPassword">
+                                    </label>
+                                    <select id="ddldepartureDatetimeminute" name="new_publication_step1[departureDate][time][minute]"
+                                        required="required" class="time-select">
+                                        <option value="" selected="selected"></option>
+                                        <option value="0">00</option>
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="30">30</option>
+                                        <option value="40">40</option>
+                                        <option value="50">50</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="width: 20%; padding-right: 20px; margin-bottom: 20px;" colspan="1">
+                                    <br />
+                                    <table style="width: 100%; padding-right: 5px">
+                                        <tr>
+                                            <td style="width: 20%; padding-right: 20px">
+                                                <input type="radio" name="vtype" value="bike" /><img src="images/cruise-bike-icon.png"
+                                                    width="45px;" height="25px" />
+                                                <input type="radio" name="vtype" value="car" /><img src="images/download (1).jpg"
+                                                    width="45px;" height="25px" />
+                                                <!-- <label for="inputPassword" class="col-lg-label">Vehicle Type </label>
+                                    <select id="Select3" name="new_publication_step1[departureDate][time][hour]" required="required" class="time-select">
+                                        <option value="" selected="selected"></option>
+                                        <option value="0">Car</option>
+                                        <option value="1">Bike</option>
+                                    </select>-->
+                                            </td>
+                                            <td style="width: 7%; padding-right: 1px">
+                                                <label for="inputPassword" class="col-lg-label">
+                                                    Seats
+                                                </label>
+                                                <select id="ddlseatsavailable" name="new_publication_step1[departureDate][time][hour]" required="required"
+                                                    class="time-select">
+                                                    <option value="" selected="selected"></option>
+                                                    <option value="0">00</option>
+                                                    <option value="1">01</option>
+                                                    <option value="2">02</option>
+                                                    <option value="3">03</option>
+                                                    <option value="4">04</option>
+                                                    <option value="5">05</option>
+                                                    <option value="6">06</option>
+                                                    <option value="7">07</option>
+                                                </select>
+                                            </td>
+                                            <td style="width: 15%; padding-right: 1px; text-align: left;">
+                                                <label for="inputPassword" class="col-lg-label">
+                                                    Vehicle Model</label>
+                                                <select id="ddlvtype" name="new_publication_step1[departureDate][time][minute]" required="required"
+                                                    class="time-select">
+                                                    <option value="" selected="selected"></option>
+                                                    <option value="Sedan">Sedan</option>
+                                                    <option value="MUV">MUV</option>
+                                                    <option value="Hatch">Hatch</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 20%; padding-right: 20px">
+                                                <br />
+                                                <label for="inputPassword" class="col-lg-label">
+                                                    Prefferd
+                                                </label>
+                                                <select id="ddlpreffered" name="new_publication_step1[departureDate][time][hour]" required="required"
+                                                    class="time-select">
+                                                    <option value="" selected="selected"></option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
+                                                    <option value="Both">Both</option>
+                                                </select>
+                                            </td>
+                                            <td style="width: 7%; padding-right: 1px" colspan="2">
+                                                <br />
+                                                <label for="inputPassword" class="col-lg-label">
+                                                    Fare
+                                                </label>
+                                                <select id="ddlfare" name="new_publication_step1[departureDate][time][hour]" required="required"
+                                                    class="time-select">
+                                                    <option value="" selected="selected"></option>
+                                                    <option value="Free">Free</option>
+                                                    <option value="Paid">Paid</option>
+                                                    <option value="Any">Any</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <br />
+                                            <td style="width: 20%; padding-right: 20px">
+                                                <br />
+                                                <a href="#" class="btn btn-primary">Search HOP</a>
+                                            </td>
+                                            <td style="width: 7%; padding-right: 1px" colspan="2">
+                                                <br />
+                                                <a href="#" class="btn btn-success" onclick="Showpostride()">Post Ride</a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div id="postride" style="visibility: hidden">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    Offer Route Map</h3>
+            </div>
+            <div class="panel-body">
+                <div style="position: absolute; left: 270px; top: 110px;">
+                    <img src="images/routemapprogress.png" />
+                </div>
+                <div class="content-wrapper">
+                    <div style="float: left; width: 50%; height: 100%; margin-bottom: 50px">
+                        <section class="main-block-content">
+                <div ng-app="Otd" ng-controller="SearchForm">
+                    <label for="inputPassword" class="col-lg-label" id="lblroute"></label>
+                    
+                </div>
+                <br />
+                <div class="well well-lg" id="availableroutes" style="width: 70%; margin-bottom: 2%;">
+                   <label for="inputPassword" class="col-lg-label" id="Label1">Available Routes</label>
+                </div>
+                <div  id="divtraveldate" style="width: 70%; margin-bottom: 2%;">
+                   <label for="inputPassword" class="col-lg-label" id="lbltraveldate"></label>
+                </div>
+                <div  id="divmodeoftravel" style="width: 70%; margin-bottom: 2%;">
+                   <label for="inputPassword" class="col-lg-label" id="lblmodeoftravel"></label>
+                </div>
+                <div  id="divseats" style="width: 70%; margin-bottom: 2%;">
+                   <label for="inputPassword" class="col-lg-label" id="lblseats"></label>
+                </div>
+                <div  id="divvmodel" style="width: 70%; margin-bottom: 2%;">
+                   <label for="inputPassword" class="col-lg-label" id="lblvmodal"></label>
+                </div>
+                <div  id="divpreffered" style="width: 70%; margin-bottom: 2%;">
+                   <label for="inputPassword" class="col-lg-label" id="lblpreffered"></label>
+                </div>
+                <div  id="divfare" style="width: 70%; margin-bottom: 2%;">
+                   <label for="inputPassword" class="col-lg-label" id="lblfare"></label>
+                </div>
+                <div  id="div1" style="width: 70%; margin-bottom: 2%;float:right;">
+                   <a href="#" class="btn btn-danger" onclick="confirmride()">Confirm</a>
+                </div>
+                    </div>
+                    
+                    </section>
+                </div>
+                <div class="panelmiddel">
+                </div>
+                <div style="float: right; width: 50%; height: 100%">
+                    <div id="map-container">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="width:400px;display:none;position: absolute;top: 390px;left: 290px;" id="divalert"><div class="alert alert-dismissable alert-success">
+        <button type="button" class="close" data-dismiss="alert" onclick="closealert();">
+            ×</button>
+        <strong>Well done!</strong> You are successfully published the Offer.
+    </div></div>
+   
+    <br />
+    
+    <br />
+    <div class="panelmiddel1">
+    </div>
+    <div class="navbar navbar-inverse">
+        <div class="navbar-header">
+            <div style="left: 500px; position: absolute">
+                <h2>
+                    About Us</h2>
+            </div>
+            <div style="left: 600px; position: absolute">
+                <h2>
+                    Questions?</h2>
+            </div>
+            <div style="left: 700px; position: absolute">
+                <h2>
+                    Contact Us</h2>
+            </div>
+            <div style="left: 800px; position: absolute">
+                <h2>
+                    Our Blog</h2>
+            </div>
+            <div style="left: 550px; position: absolute; top: 25px;">
+                © 2014 Hopride.com. All rights reserved.
+            </div>
+        </div>
+    </div>
+
+    	<div class="featurette" id="sec2">
+	  <div class="container">
+		<div class="row">
+		  <div class="col-md-12 text-center">
+			<h1>how it works</h1>
+                        <h3>Steps for a happy and comfortable ride</h3>
+                        </div>
+		</div>
+                   
+                     <div class="row">
+                          <div class="container">
+                          <div class="col-md-12 text-center">
+                          <img src="assets/how it works 1.png" class="img-responsive">
+                          </div> 
+                          
+                        </div>
+                   </div>
+
+		
+		</div>
+	  </div>
+	</div>
+
+	<div class="callout" id="sec3">
+	  <div class="vert">
+		<div class="col-md-12 text-center"><h2>Safety</h2></div>
+		<div class="col-md-12 text-center">&nbsp;</div>
+		<div class="col-md-8 col-md-offset-2 text-center">
+		  <div class="row hidden-xs">
+		   <div class="col-sm-2"><img class="img-circle grayscale" src="http://api.randomuser.me/portraits/thumb/women/1233.jpg"></div>
+		   <div class="col-sm-2"><img class="img-circle grayscale" src="http://api.randomuser.me/portraits/thumb/men/9544.jpg"></div>
+		   <div class="col-sm-2"><img class="img-circle grayscale" src="http://api.randomuser.me/portraits/thumb/women/6744.jpg"></div>
+		   <div class="col-sm-2"><img class="img-circle grayscale" src="http://api.randomuser.me/portraits/thumb/men/2744.jpg"></div>
+		   <div class="col-sm-2"><img class="img-circle grayscale" src="http://api.randomuser.me/portraits/thumb/women/1544.jpg"></div>  
+		   <div class="col-sm-2"><img class="img-circle grayscale" src="http://api.randomuser.me/portraits/thumb/men/1844.jpg"></div>
+		  </div>
+		</div>
+	  </div>
+	</div>
+
+	<div class="blurb" id="sec4">
+	  <div class="container">
+		<div class="row">
+		  <div class="col-md-12 text-center">
+			<h1>Stories</h1>
+			<img src="assets/bg_smartphones.jpg" class="img-responsive">
+		  </div>
+		</div>
+	  </div>
+	</div>
+
+	<hr>
+
+	<div class="gallery">
+	  <div class="blurb" id="sec5">
+	  <div class="container">
+	  <div class="row">
+		  <div class="col-md-6 col-md-offset-3 text-center">
+			<h2>About us</h2>
+			<h5>hopride</h5>
+			<br>
+		  </div>
+	  </div>
+	  
+	  <div class="container well well-lg">
+
+    <script type="text/javascript">
+        var Demo = {
+            // HTML Nodes
+            mapContainer: document.getElementById('map-container'),
+            dirContainer: document.getElementById('dir-container'),
+            diravailableroutes: document.getElementById('availableroutes'),
+            fromInput: document.getElementById('google_places_ac'),
+            toInput: document.getElementById('google_places_ac1'),
+            travelModeInput: document.getElementById('travel-mode-input'),
+            unitInput: document.getElementById('unit-input'),
+
+            // API Objects
+            dirService: new google.maps.DirectionsService(),
+            dirRenderer: new google.maps.DirectionsRenderer(),
+            dirRendererdown: new google.maps.DirectionsRenderer(),
+            map: null,
+
+            showDirections: function (dirResult, dirStatus) {
+                if (dirStatus != google.maps.DirectionsStatus.OK) {
+                    alert('Directions failed: ' + dirStatus);
+                    return;
+                }
+
+                // Show directions
+                Demo.dirRenderer.setMap(Demo.map);
+                Demo.dirRenderer.setPanel(Demo.dirContainer);
+                Demo.dirRenderer.setDirections(dirResult);
+
+                // Show directions
+                Demo.dirRendererdown.setMap(Demo.map);
+                Demo.dirRendererdown.setPanel(Demo.diravailableroutes);
+                Demo.dirRendererdown.setDirections(dirResult);
+            },
+
+            getSelectedTravelMode: function () {
+                var value =
+                //Demo.travelModeInput.options[Demo.travelModeInput.selectedIndex].value;
+                value = google.maps.DirectionsTravelMode.DRIVING;
+                //if (value == 'driving') {
+                //    value = google.maps.DirectionsTravelMode.DRIVING;
+                //} else if (value == 'bicycling') {
+                //    value = google.maps.DirectionsTravelMode.BICYCLING;
+                //} else if (value == 'walking') {
+                //    value = google.maps.DirectionsTravelMode.WALKING;
+                //} else {
+                //    alert('Unsupported travel mode.');
+                //}
+                return value;
+            },
+
+            getSelectedUnitSystem: function () {
+                var unitvalue = google.maps.DirectionsUnitSystem.METRIC;
+                return unitvalue;
+                //                return Demo.unitInput.options[Demo.unitInput.selectedIndex].value == 'metric' ?
+                //                    google.maps.DirectionsUnitSystem.METRIC :
+                //                    google.maps.DirectionsUnitSystem.IMPERIAL;
+
+            },
+
+            getDirections: function () {
+                var fromStr = document.getElementById('google_places_ac').value;
+                var toStr = document.getElementById('google_places_ac1').value;
+                var dirRequest = {
+                    origin: fromStr,
+                    destination: toStr,
+                    travelMode: Demo.getSelectedTravelMode(),
+                    unitSystem: Demo.getSelectedUnitSystem(),
+                    provideRouteAlternatives: true
+                };
+                Demo.dirService.route(dirRequest, Demo.showDirections);
+            },
+
+            init: function () {
+                var latLng = new google.maps.LatLng(13.0839, 80.2700);
+                Demo.map = new google.maps.Map(Demo.mapContainer, {
+                    zoom: 13,
+                    center: latLng,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                });
+
+                // Show directions onload
+                //Demo.getDirections();
+            }
+        };
+
+
+        google.maps.event.addDomListener(window, 'load', Demo.init);
+    </script>
+
+	<!-- script references -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="js/scripts.js"></script>
+	</body>
+</html>
